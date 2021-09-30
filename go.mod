@@ -12,3 +12,5 @@ require (
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/takuoki/gocase v1.0.0 // indirect
 )
+
+require github.com/caarlos0/env/v6 v6.7.1 // indirect

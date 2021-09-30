@@ -1,10 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"time"
 
+	"github.com/caarlos0/env/v6"
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 
@@ -15,11 +17,19 @@ import (
 	"github.com/lucasvmiguel/go-api-test/pkg/ping"
 )
 
-var port = ":8080"
+type config struct {
+	Port int `env:"PORT" envDefault:"8080"`
+}
 
 func main() {
+	cfg := config{}
+	err := env.Parse(&cfg)
+	if err != nil {
+		cmd.ExitWithError("failed to read config", err)
+	}
+
 	dbClient := db.NewClient()
-	err := dbClient.Prisma.Connect()
+	err = dbClient.Prisma.Connect()
 	if err != nil {
 		cmd.ExitWithError("failed to connect to the DB", err)
 	}
@@ -66,6 +76,6 @@ func main() {
 	}
 	router.Get("/posts", postHandlerGet.ServeHTTP)
 
-	log.Printf("listening on port %s", port)
-	log.Println(http.ListenAndServe(port, router))
+	log.Printf("listening on port %d", cfg.Port)
+	log.Println(http.ListenAndServe(fmt.Sprintf(":%d", cfg.Port), router))
 }
