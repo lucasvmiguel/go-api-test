@@ -10,9 +10,9 @@ import (
 )
 
 var (
-	EmptyBaseUrlError                = errors.New("base url cannot be empty or null")
-	EmptyHTTPClientError             = errors.New("http client cannot be empty or null")
-	FailedAPIStatusCodeResponseError = errors.New("api returned with a failed status code response")
+	ErrEmptyBaseUrl                = errors.New("base url cannot be empty or null")
+	ErrEmptyHTTPClient             = errors.New("http client cannot be empty or null")
+	ErrFailedAPIStatusCodeResponse = errors.New("api returned with a failed status code response")
 )
 
 type Handler struct {
@@ -22,11 +22,11 @@ type Handler struct {
 
 func NewHandler(httpClient client.HTTP, baseUrl string) (*Handler, error) {
 	if baseUrl == "" {
-		return nil, EmptyBaseUrlError
+		return nil, ErrEmptyBaseUrl
 	}
 
 	if httpClient == nil {
-		return nil, EmptyHTTPClientError
+		return nil, ErrEmptyHTTPClient
 	}
 
 	return &Handler{
@@ -35,7 +35,7 @@ func NewHandler(httpClient client.HTTP, baseUrl string) (*Handler, error) {
 	}, nil
 }
 
-func (h *Handler) Handle(w http.ResponseWriter, req *http.Request) {
+func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	request, _ := http.NewRequest(http.MethodGet, h.baseUrl, nil)
 	resp, err := h.httpClient.Do(request)
 	if err != nil {
@@ -44,7 +44,7 @@ func (h *Handler) Handle(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if resp.StatusCode >= 400 {
-		respond.HTTPError(w, http.StatusInternalServerError, FailedAPIStatusCodeResponseError)
+		respond.HTTPError(w, http.StatusInternalServerError, ErrFailedAPIStatusCodeResponse)
 		return
 	}
 

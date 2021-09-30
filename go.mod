@@ -3,6 +3,7 @@ module github.com/lucasvmiguel/go-api-test
 go 1.17
 
 require (
+	github.com/davecgh/go-spew v1.1.1
 	github.com/go-chi/chi v1.5.4
 	github.com/go-chi/chi/v5 v5.0.4 // indirect
 	github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365 // indirect

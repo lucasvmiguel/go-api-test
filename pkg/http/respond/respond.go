@@ -17,19 +17,25 @@ type errorBody struct {
 	Message string `json:"message"`
 }
 
-func HTTP(resp Response) {
-	resp.Writer.Header().Set("Content-Type", "application/json")
+var (
+	contentTypeKey   = "Content-Type"
+	contentTypeValue = "application/json"
+)
 
+func HTTP(resp Response) {
 	if resp.Err != nil {
 		HTTPError(resp.Writer, resp.StatusCode, resp.Err)
 		return
 	}
 
+	resp.Writer.Header().Set(contentTypeKey, contentTypeValue)
 	resp.Writer.WriteHeader(resp.StatusCode)
 	json.NewEncoder(resp.Writer).Encode(resp.Body)
 }
 
 func HTTPError(w http.ResponseWriter, statusCode int, err error) {
+	w.Header().Set(contentTypeKey, contentTypeValue)
+
 	log.Println(err)
 
 	w.WriteHeader(statusCode)

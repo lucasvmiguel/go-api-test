@@ -1,6 +1,7 @@
 package main
 
 import (
+	"log"
 	"net/http"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 	"github.com/lucasvmiguel/go-api-test/pkg/cmd"
 	"github.com/lucasvmiguel/go-api-test/pkg/ping"
 )
+
+var port = ":8080"
 
 func main() {
 	dbClient := db.NewClient()
@@ -47,17 +50,22 @@ func main() {
 	if err != nil {
 		cmd.ExitWithError("todo handler had an error", err)
 	}
-	router.Get("/todos", todoHandler.Handle)
+	router.Get("/todos", todoHandler.ServeHTTP)
 
-	// post handler
-	postHandler, err := post.NewHandler(dbClient)
+	// post handler [POST]
+	postHandlerPost, err := post.NewHandlerPost(dbClient)
 	if err != nil {
-		cmd.ExitWithError("post handler had an error", err)
+		cmd.ExitWithError("post handler post had an error", err)
 	}
-	router.Route("/posts", func(r chi.Router) {
-		r.Post("/", postHandler.HandlePost)
-		r.Get("/", postHandler.HandleGet)
-	})
+	router.Post("/posts", postHandlerPost.ServeHTTP)
 
-	http.ListenAndServe(":8080", router)
+	// post handler [GET]
+	postHandlerGet, err := post.NewHandlerGet(dbClient)
+	if err != nil {
+		cmd.ExitWithError("post handler get had an error", err)
+	}
+	router.Get("/posts", postHandlerGet.ServeHTTP)
+
+	log.Printf("listening on port %s", port)
+	log.Println(http.ListenAndServe(port, router))
 }
