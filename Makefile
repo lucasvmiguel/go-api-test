@@ -12,7 +12,7 @@ db-generate:
 run-api:
 	go run cmd/api/main.go
 
-build-api:
+build-api: db-migrate db-generate
 	go build cmd/api/main.go
 
 test-unit:
